@@ -1,75 +1,95 @@
-class GestorNombres:
-    
+class GestorInventario:
+
     def __init__(self):
-        self.nombres = ["Sebastian", "Diego", "Soto", "Zule", "Mechas"]
+        self.inventario = {
+            "Teclado mecánico": 85.50,
+            "Ratón inalámbrico": 30.00,
+            "Monitor 27 pulgadas": 250.99,
+            "Disco SSD 1TB": 65.75
+        }
+
+    def _mostrar_resumen(self):
+        total_productos = len(self.inventario)
+        
+        if total_productos > 0:
+            suma_precios = 0
+            for precio in self.inventario.values():
+                suma_precios += precio
+            
+            promedio_precios = suma_precios / total_productos
+            
+            print("\n--- Resumen del Inventario ---")
+            print(f"Total de productos en stock: {total_productos}")
+            print(f"El precio promedio de todos los artículos es: ${promedio_precios:.2f}")
+        else:
+            print("\nEl inventario está vacío. No hay precios para promediar.")
 
     def mostrar_menu(self):
-        print("\n--- ¿Qué quieres hacer hoy? ---")
-        print("1. Meter a alguien nuevo")
-        print("2. Ver toda la lista")
-        print("3. Cambiar el nombre de alguien")
-        print("4. Sacar a alguien por su número")
+        print("\n--- ¿Qué quieres hacer con el inventario? ---")
+        print("1. Agregar un producto nuevo")
+        print("2. Consultar precio de un producto")
+        print("3. Modificar precio de un producto")
+        print("4. Eliminar un producto")
 
     def ejecutar_accion(self, opcion):
         if opcion == 1:
-            self._agregar_nombre()
+            self._agregar_producto()
         elif opcion == 2:
-            self._mostrar_nombres()
+            self._consultar_precio()
         elif opcion == 3:
-            self._cambiar_nombre()
+            self._modificar_precio()
         elif opcion == 4:
-            self._eliminar_nombre()
+            self._eliminar_producto()
         else:
-            print("Mmm, esa opción no la conozco. Elige del 1 al 4, por favor.")
+            print("Elige del 1 al 4, por favor.")
+            
+        self._mostrar_resumen()
 
-    def _agregar_nombre(self):
-        if (nuevo_nombre := input("¿A quién quieres meter? ").strip()) in self.nombres:
-            print(f"¡Ojo! '{nuevo_nombre}' ya está aquí. No valen duplicados.")
-        elif nuevo_nombre == "":
-            print("¡Escribe un nombre de verdad, por favor!")
+    def _agregar_producto(self):
+        if (nuevo_producto := input("Dime el nombre del producto: ").strip()) in self.inventario:
+            print(f"¡Ojo! '{nuevo_producto}' ya está en el inventario.")
+        elif nuevo_producto == "":
+            print("¡No puedes agregar un nombre vacío!")
         else:
-            self.nombres.append(nuevo_nombre)
-            print(f"¡Bien! '{nuevo_nombre}' se une al equipo.")
-            print("Así quedó la lista:", self.nombres)
-
-    def _mostrar_nombres(self):
-        print("\n--- ¡Mira quién anda por aquí! ---")
-        
-        if not self.nombres:
-            print("Uy, la lista está vacía. ¡Qué tristeza!")
-        else:
-            for i in range(len(self.nombres)):
-                print(f"{i+1}. {self.nombres[i]}")
-
-    def _cambiar_nombre(self):
-        posicion_str = input(f"¿Qué número quieres cambiar? (del 1 al {len(self.nombres)}): ").strip()
-        
-        if posicion_str.isdigit() and 1 <= (posicion := int(posicion_str)) <= len(self.nombres):
-            if (nuevo_nombre := input(f"¿Cómo se llama ahora la persona en el número {posicion} ({self.nombres[posicion-1]})? ").strip()) in self.nombres:
-                print(f"¡Eh! '{nuevo_nombre}' ya lo tenemos. Busca otro nombre.")
-            elif nuevo_nombre == "":
-                print("¡No lo dejes vacío!")
+            precio_str = input(f"¿Qué precio tiene '{nuevo_producto}'? (Ej. 10.50): ").strip()
+            
+            if (precio_str.replace('.', '', 1)).isdigit():
+                self.inventario[nuevo_producto] = float(precio_str)
+                print(f"¡Genial! '{nuevo_producto}' agregado con precio ${float(precio_str):.2f}.")
             else:
-                self.nombres[posicion - 1] = nuevo_nombre
-                print(f"¡Listo! El número {posicion} ahora es '{nuevo_nombre}'.")
-                print("Así quedó la lista:", self.nombres)
+                print("El precio que ingresaste no parece un número válido. No se agregó nada.")
+
+    def _consultar_precio(self):
+        if (producto_consultar := input("Dime el producto que quieres buscar: ").strip()) in self.inventario:
+            precio = self.inventario[producto_consultar]
+            print(f"El precio de '{producto_consultar}' es: ${precio:.2f}")
         else:
-            print("Ese número no existe en la lista o no es un número. Fíjate bien.")
+            print(f"¡Ups! '{producto_consultar}' no se encuentra en el inventario.")
 
-    def _eliminar_nombre(self):
-        posicion_str = input(f"Dime el número (del 1 al {len(self.nombres)}) de la persona que se va: ").strip()
-        
-        if posicion_str.isdigit() and 1 <= (posicion := int(posicion_str)) <= len(self.nombres):
-            nombre_eliminado = self.nombres.pop(posicion - 1)
-            print(f"¡Adiós! '{nombre_eliminado}' se fue del número {posicion}.")
-            print("Así quedó la lista:", self.nombres)
+    def _modificar_precio(self):
+        if (producto_modificar := input("¿Qué producto quieres actualizar? ").strip()) not in self.inventario:
+            print(f"No puedo modificar '{producto_modificar}' porque no existe.")
         else:
-            print("Ese número está fuera de rango o no es un número. ¿Contaste bien?")
+            precio_actual = self.inventario[producto_modificar]
+            print(f"El precio actual de '{producto_modificar}' es: ${precio_actual:.2f}")
+            nuevo_precio_str = input("Dime el nuevo precio (Ej. 10.50): ").strip()
+            
+            if (nuevo_precio_str.replace('.', '', 1)).isdigit():
+                self.inventario[producto_modificar] = float(nuevo_precio_str)
+                print(f"¡Precio actualizado! '{producto_modificar}' ahora cuesta: ${float(nuevo_precio_str):.2f}.")
+            else:
+                print("El precio que ingresaste no parece un número válido. No se realizó el cambio.")
 
+    def _eliminar_producto(self):
+        if (producto_eliminar := input("Dime el producto que quieres eliminar: ").strip()) in self.inventario:
+            del self.inventario[producto_eliminar]
+            print(f"¡Hecho! '{producto_eliminar}' ha sido eliminado del inventario.")
+        else:
+            print(f"No puedo eliminar '{producto_eliminar}' porque no lo encuentro.")
 
-gestor = GestorNombres()
+gestor = GestorInventario()
 
-print("¡Hola! La lista inicial de gente es:", gestor.nombres)
+print("Inventario inicial es:", gestor.inventario)
 
 gestor.mostrar_menu()
 opcion_str = input("Dime el número de tu elección: ")
